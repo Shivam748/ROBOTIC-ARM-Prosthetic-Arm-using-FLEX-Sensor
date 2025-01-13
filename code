@@ -1,0 +1,56 @@
+#include <Servo.h>
+// Define servo objects for each finger
+Servo thumbServo;
+Servo indexServo;
+Servo middleServo;
+Servo ringServo;
+Servo pinkyServo;
+// Flex sensor analog pins
+const int flexPins[5] = {A0, A1, A2, A3, A4}; // Flex sensors connected to A0-A4
+// Servo pin connections
+const int servoPins[5] = {3, 5, 6, 9, 10}; // Servo motors connected to PWM pins
+// Flex sensor calibration values (adjust these based on your sensor readings)
+const int flexMin = 300; // Minimum flex value when straight
+const int flexMax = 700; // Maximum flex value when fully bent
+void setup() {
+// Attach servos to their respective pins
+thumbServo.attach(servoPins[0]);
+indexServo.attach(servoPins[1]);
+middleServo.attach(servoPins[2]);
+ringServo.attach(servoPins[3]);
+pinkyServo.attach(servoPins[4]);
+
+// Initialize Serial Monitor for debugging
+Serial.begin(9600);
+Serial.println("Bionic Arm Initialized...");
+}
+void loop() {
+// Array to store flex sensor values
+int flexValues[5];
+// Read and map each flex sensor value to servo angles (0-180 degrees)
+for (int i = 0; i < 5; i++) {
+flexValues[i] = analogRead(flexPins[i]); // Read flex sensor value
+int servoAngle = map(flexValues[i], flexMin, flexMax, 0, 180); // Map to servo angle
+servoAngle = constrain(servoAngle, 0, 180); // Ensure angle is within 0-180 degrees
+// Write the angle to the corresponding servo
+switch (i) {
+case 0: thumbServo.write(servoAngle); break;
+case 1: indexServo.write(servoAngle); break;
+case 2: middleServo.write(servoAngle); break;
+case 3: ringServo.write(servoAngle); break;
+case 4: pinkyServo.write(servoAngle); break;
+}
+}
+// Print sensor values and servo angles to the Serial Monitor for debugging
+
+Serial.print("Flex Sensor Values: ");
+for (int i = 0; i < 5; i++) {
+Serial.print("Sensor ");
+Serial.print(i + 1);
+Serial.print(": ");
+Serial.print(flexValues[i]);
+if (i < 4) Serial.print(" | ");
+}
+Serial.println();
+delay(100); // Delay for stability
+}
